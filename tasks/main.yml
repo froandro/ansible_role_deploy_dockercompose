@@ -1,0 +1,9 @@
+---
+# tasks file for ansible_role_doploy_dockercompose
+
+- name: Install on Debian os family
+  include_tasks: task_Debian.yml
+  when:
+    ansible_os_family == 'Debian'
+
+...

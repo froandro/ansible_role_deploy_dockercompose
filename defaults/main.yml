@@ -1,0 +1,7 @@
+---
+# defaults file for roles/ansible_role_deploy_dockercompose
+#
+path_to_composefile: "~"
+name_composefile: "docker-compose.yml"
+stack_name: "deploystack"
+path_to_docker: "/usr/bin/docker"

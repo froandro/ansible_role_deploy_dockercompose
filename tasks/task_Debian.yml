@@ -1,0 +1,28 @@
+---
+# tasks file for ansible_role_deploy_dockercompose
+- name: Collect facts
+  ansible.builtin.setup:
+  register: out
+
+- name: Appending $USER to the `docker` group
+  become: true
+  ansible.builtin.user:
+    name: "{{ out.ansible_facts.ansible_user_id }}"
+    groups: docker
+    append: yes
+       
+- name: Copy template docker-compose
+  ansible.builtin.template:
+    src: docker-compose.j2
+    dest: "{{ path_to_composefile }}/{{ name_composefile }}" #~/docker-compose.yml
+
+- name: Deploy deploy-compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ path_to_composefile }}/" #~/
+    project_name: "{{ stack_name }}" 
+
+- name: Delete docker-compose.yml on remote host
+  ansible.builtin.file:
+    path:  "{{ path_to_composefile }}/{{ name_composefile }}"
+    state: absent
+
