@@ -1,7 +1,28 @@
 ---
 # defaults file for roles/ansible_role_deploy_dockercompose
 #
-path_to_composefile: "~"
-name_composefile: "docker-compose.yml"
-stack_name: "deploystack"
-path_to_docker: "/usr/bin/docker"
+### Task variables ########
+path_to_composefile:    "${PWD}"
+path_to_Dockerfile:     "{{ path_to_composefile }}"
+name_composefile:       "docker-compose.yml" 
+stack_name:             "deploystack"
+path_to_docker:         "/usr/bin/docker"
+
+### Containers variables #####
+compose_version:        "3.8"
+
+### Nginx container variables ######
+nginx_image:            "nginx:1.25-alpine"
+host_port:              "80"
+nginx_port:             "80"
+path_to_confignginx:    "${PWD}/nginx"
+name_nginxfile:         "php.conf"
+
+### PHP container variables ######
+path_to_configphp:      "${PWD}/php"
+name_phpfile:           "index.php"
+
+### Mysql container variables ######
+path_to_configmysql:      "${PWD}/mysql"
+name_mysqlfile:           "my.cnf"
+mysql_image:              "mysql/mysql-server:8.0"

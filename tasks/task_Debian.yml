@@ -10,19 +10,50 @@
     name: "{{ out.ansible_facts.ansible_user_id }}"
     groups: docker
     append: yes
-       
+
+- name: Create config dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ path_to_confignginx }}"
+    - "{{ path_to_configphp }}"
+    - "{{ path_to_configmysql }}"
+
+- name: Copy template nginx config
+  ansible.builtin.template:
+    src: nginx-config.j2
+    dest: "{{ path_to_confignginx }}/{{ name_nginxfile}}"
+  notify:
+    - Deploy stack
+
+- name: Copy Dockerfile to remote host
+  ansible.builtin.copy:
+    src: "Dockerfile" 
+    dest: "{{ path_to_Dockerfile }}/Dockerfile"
+  notify:
+    - Deploy stack
+
+- name: Copy template php config
+  ansible.builtin.template:
+    src: php-config.j2
+    dest: "{{ path_to_configphp }}/{{ name_phpfile }}"
+  notify:
+    - Deploy stack
+
+- name: Copy template mysql config
+  ansible.builtin.template:
+    src: my.j2
+    dest: "{{ path_to_configmysql }}/{{ name_mysqlfile }}"
+  notify:
+    - Deploy stack
+
 - name: Copy template docker-compose
   ansible.builtin.template:
     src: docker-compose.j2
-    dest: "{{ path_to_composefile }}/{{ name_composefile }}" #~/docker-compose.yml
+    dest: "{{ path_to_composefile }}/{{ name_composefile }}"
+  notify:
+    - Deploy stack
 
-- name: Deploy deploy-compose stack
-  community.docker.docker_compose_v2:
-    project_src: "{{ path_to_composefile }}/" #~/
-    project_name: "{{ stack_name }}" 
 
-- name: Delete docker-compose.yml on remote host
-  ansible.builtin.file:
-    path:  "{{ path_to_composefile }}/{{ name_composefile }}"
-    state: absent
 

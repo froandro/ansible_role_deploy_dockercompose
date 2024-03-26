@@ -1,11 +1,50 @@
 ---
-version: '3.8'
+version: "'{{ compose_version }}'" 
 
 # Services
 services:
   # Nginx Service
   nginx:
-    image: nginx:1.21
+    image: "{{ nginx_image  }}"
     ports:
-      - 80:80
+      - "{{ host_port }}:{{ nginx_port }}"
+    volumes:
+      - type: bind
+        source: "{{ path_to_configphp }}/{{ name_phpfile }}"
+        target: "/var/www/php/index.php"
+      - type: bind
+        source: "{{ path_to_confignginx }}/{{ name_nginxfile }}"
+        target: "/etc/nginx/conf.d/php.conf"
+    depends_on:
+      - php
+
+  # PHP Service
+  php:
+    build: "{{ path_to_Dockerfile }}" 
+    working_dir: "/var/www/php"
+    volumes:
+      - type: bind
+        source: "{{ path_to_configphp }}/{{ name_phpfile }}"
+        target: "/var/www/php/index.php"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # MySQL Service
+  mysql:
+    image: "{{ mysql_image }}"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: "demo"
+    volumes:
+      - "{{ path_to_configmysql }}/{{ name_mysqlfile }}:/etc/mysql/conf.d/my.cnf"
+      - "mysqldata:/var/lib/mysql"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+      interval: 5s
+      retries: 10
+# Volumes
+volumes:
+  mysqldata:
 ...
