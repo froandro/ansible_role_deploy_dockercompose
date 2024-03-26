@@ -1,38 +1,51 @@
 Role Name
 =========
-
-A brief description of the role goes here.
+The Ansible role allows you to deploy the `nginx+php+mysql` stack from a `docker-compose` file. The configuration files are located in the `/templates` and `/files` directories.
 
 Requirements
 ------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Use: `ansible-galaxy collection install community.docker`.
+To use it in a playbook, specify: `community.docker.docker_compose_v2`.
 
 Role Variables
 --------------
+```
+---
+# defaults file for roles/ansible_role_deploy_dockercompose
+#
+### Task variables ########
+path_to_composefile:    "${PWD}"
+path_to_Dockerfile:     "{{ path_to_composefile }}"
+name_composefile:       "docker-compose.yml"
+stack_name:             "deploystack"
+path_to_docker:         "/usr/bin/docker"
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+### Containers variables #####
+compose_version:        "3.8"
 
-Dependencies
-------------
+### Nginx container variables ######
+nginx_image:            "nginx:1.25-alpine"
+host_port:              "80"
+nginx_port:             "80"
+path_to_confignginx:    "${PWD}/nginx"
+name_nginxfile:         "php.conf"
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+### PHP container variables ######
+path_to_configphp:      "${PWD}/php"
+name_phpfile:           "index.php"
 
+### Mysql container variables ######
+path_to_configmysql:      "${PWD}/mysql"
+name_mysqlfile:           "my.cnf"
+mysql_image:              "mysql/mysql-server:8.0"
+
+```
 Example Playbook
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```
+- name: Deploy Docker Compose file
+  hosts: compose
+  tags: compose
+  roles:
+    - ansible_role_deploy_dockercompose
+```
