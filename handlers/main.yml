@@ -7,7 +7,3 @@
     project_name: "{{ stack_name }}"
     recreate: always 
 
-#- name: Deploy stack
-#  ansible.builtin.shell: docker compose up --detach --build
-#  args:
-#    chdir: "{{ path_to_composefile }}"
